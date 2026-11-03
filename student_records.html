@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183c34">
+  <title>Student Records</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20342e;
+      --muted: #64736d;
+      --paper: #f3f6f2;
+      --surface: #ffffff;
+      --line: #dce5df;
+      --green: #183c34;
+      --green-dark: #102e28;
+      --coral: #bd543e;
+      --coral-pale: #fae9e3;
+      --green-pale: #e6f0e9;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#d7e1da 0.7px, transparent 0.7px);
+      background-size: 18px 18px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page-header {
+      padding: 28px max(24px, calc((100% - 1120px) / 2));
+      color: #f6f8f5;
+      background: var(--green);
+      border-bottom: 5px solid #d97458;
+    }
+
+    .header-inner,
+    main {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #b7d1c2;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      font-family: Cambria, Georgia, serif;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .header-copy {
+      margin: 8px 0 0;
+      color: #d7e4dc;
+      font-size: 0.95rem;
+    }
+
+    main {
+      padding: 28px 0 48px;
+    }
+
+    .entry-section {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--coral);
+      box-shadow: 0 8px 24px rgb(32 52 46 / 5%);
+      animation: arrive 350ms ease-out both;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+    }
+
+    .required-note,
+    .storage-note {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 0.83rem;
+      font-weight: 650;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fbfcfa;
+      border: 1px solid #cbd7cf;
+      border-radius: 3px;
+    }
+
+    .field input:focus {
+      border-color: var(--green);
+      outline: 3px solid rgb(24 60 52 / 14%);
+    }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .primary-button {
+      min-height: 44px;
+      padding: 0 18px;
+      color: #fff;
+      background: var(--green);
+      border: 0;
+      border-radius: 3px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .primary-button:hover {
+      background: var(--green-dark);
+    }
+
+    .primary-button:focus-visible,
+    .delete-button:focus-visible {
+      outline: 3px solid #e8a08d;
+      outline-offset: 2px;
+    }
+
+    .message {
+      min-height: 1.25rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .message.error {
+      color: #a33b2c;
+    }
+
+    .results-section {
+      margin-top: 32px;
+      animation: arrive 450ms 80ms ease-out both;
+    }
+
+    .results-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .record-count {
+      display: inline-flex;
+      min-width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      margin-left: 6px;
+      padding: 0 8px;
+      color: var(--green);
+      background: var(--green-pale);
+      border-radius: 20px;
+      font: 700 0.82rem "Segoe UI", Tahoma, sans-serif;
+      vertical-align: 2px;
+    }
+
+    .storage-note {
+      margin: 0 0 12px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    th {
+      color: #52645c;
+      background: #eaf0eb;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    td {
+      font-size: 0.9rem;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-button {
+      padding: 5px 8px;
+      border: 0;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .edit-button {
+      color: var(--green);
+      background: var(--green-pale);
+    }
+
+    .copy-button {
+      color: #435a70;
+      background: #e8eef3;
+    }
+
+    .delete-button {
+      color: var(--coral);
+      background: var(--coral-pale);
+    }
+
+    .edit-button:hover,
+    .copy-button:hover,
+    .delete-button:hover {
+      color: #fff;
+      background: var(--coral);
+    }
+
+    .edit-button:hover { background: var(--green); }
+    .copy-button:hover { background: #435a70; }
+
+    .secondary-button {
+      min-height: 44px;
+      padding: 0 14px;
+      color: var(--green);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .secondary-button:hover {
+      background: var(--green-pale);
+    }
+
+    .empty-state {
+      padding: 28px 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @keyframes arrive {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .header-inner,
+      main {
+        width: min(100% - 28px, 1120px);
+      }
+
+      .page-header {
+        padding: 24px 14px;
+      }
+
+      main {
+        padding-top: 18px;
+      }
+
+      .entry-section {
+        padding: 18px 14px;
+      }
+
+      .section-heading,
+      .form-footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .results-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-inner">
+      <p class="eyebrow">Student administration</p>
+      <h1>Student Records</h1>
+      <p class="header-copy">Add student details and review the saved records below.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="entry-section" aria-labelledby="form-heading">
+      <div class="section-heading">
+        <h2 id="form-heading">Add a student</h2>
+        <span class="required-note">All fields are required</span>
+      </div>
+      <form id="student-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="student-name">Full name</label>
+            <input id="student-name" name="name" type="text" autocomplete="name" maxlength="80" required>
+          </div>
+          <div class="field">
+            <label for="student-id">Student ID</label>
+            <input id="student-id" name="studentId" type="text" maxlength="30" required>
+          </div>
+          <div class="field">
+            <label for="student-class">Class or grade</label>
+            <input id="student-class" name="className" type="text" maxlength="40" required>
+          </div>
+          <div class="field">
+            <label for="student-age">Age</label>
+            <input id="student-age" name="age" type="number" min="1" max="120" inputmode="numeric" required>
+          </div>
+          <div class="field">
+            <label for="student-email">Email address</label>
+            <input id="student-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="primary-button" id="submit-button" type="submit">Save student</button>
+          <button class="secondary-button" id="cancel-edit" type="button" hidden>Cancel edit</button>
+          <p class="message" id="form-message" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-heading">
+      <div class="results-heading">
+        <h2 id="results-heading">Saved students <span class="record-count" id="record-count">0</span></h2>
+      </div>
+      <p class="storage-note">Records are saved in this browser on this device.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Student ID</th>
+              <th scope="col">Class or grade</th>
+              <th scope="col">Age</th>
+              <th scope="col">Email</th>
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="student-list"></tbody>
+        </table>
+        <p class="empty-state" id="empty-state">No student records yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+  </style>
+
+  <script>
+    const storageKey = "student-records";
+    const studentForm = document.querySelector("#student-form");
+    const studentList = document.querySelector("#student-list");
+    const recordCount = document.querySelector("#record-count");
+    const emptyState = document.querySelector("#empty-state");
+    const formMessage = document.querySelector("#form-message");
+
+    function loadStudents() {
+      try {
+        const savedStudents = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        return Array.isArray(savedStudents) ? savedStudents : [];
+      } catch {
+        return [];
+      }
+    }
+
+    let students = loadStudents();
+
+    function saveStudents() {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(students));
+        return true;
+      } catch {
+        formMessage.textContent = "Could not save records. Check your browser storage settings.";
+        formMessage.classList.add("error");
+        return false;
+      }
+    }
+
+    function renderStudents() {
+      studentList.replaceChildren();
+      recordCount.textContent = String(students.length);
+      emptyState.hidden = students.length > 0;
+
+      students.forEach((student) => {
+        const row = document.createElement("tr");
+        const values = [student.name, student.studentId, student.className, student.age, student.email];
+
+        values.forEach((value) => {
+          const cell = document.createElement("td");
+          cell.textContent = String(value);
+          row.append(cell);
+        });
+
+        const actionCell = document.createElement("td");
+        const actionButtons = document.createElement("div");
+        actionButtons.className = "action-buttons";
+        const editButton = document.createElement("button");
+        editButton.className = "action-button edit-button";
+        editButton.type = "button";
+        editButton.textContent = "Edit";
+        editButton.setAttribute("aria-label", `Edit ${student.name}`);
+        editButton.addEventListener("click", () => editStudent(student.studentId));
+        actionButtons.append(editButton);
+
+        const copyButton = document.createElement("button");
+        copyButton.className = "action-button copy-button";
+        copyButton.type = "button";
+        copyButton.textContent = "Copy";
+        copyButton.setAttribute("aria-label", `Copy details for ${student.name}`);
+        copyButton.addEventListener("click", () => copyStudent(student));
+        actionButtons.append(copyButton);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "action-button delete-button";
+        deleteButton.type = "button";
+        deleteButton.textContent = "Remove";
+        deleteButton.setAttribute("aria-label", `Remove ${student.name}`);
+        deleteButton.addEventListener("click", () => removeStudent(student.studentId));
+        actionButtons.append(deleteButton);
+        actionCell.append(actionButtons);
+        row.append(actionCell);
+        studentList.append(row);
+      });
+    }
+
+    let editingStudentId = null;
+
+    function editStudent(studentId) {
+      const student = students.find((savedStudent) => savedStudent.studentId === studentId);
+      if (!student) return;
+
+      editingStudentId = student.studentId;
+      studentForm.elements.name.value = student.name;
+      studentForm.elements.studentId.value = student.studentId;
+      studentForm.elements.className.value = student.className;
+      studentForm.elements.age.value = student.age;
+      studentForm.elements.email.value = student.email;
+      document.querySelector("#form-heading").textContent = "Update student";
+      document.querySelector("#submit-button").textContent = "Update student";
+      document.querySelector("#cancel-edit").hidden = false;
+      formMessage.textContent = `Editing ${student.name}.`;
+      formMessage.classList.remove("error");
+      document.querySelector("#student-name").focus();
+      studentForm.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function cancelEditing() {
+      editingStudentId = null;
+      studentForm.reset();
+      document.querySelector("#form-heading").textContent = "Add a student";
+      document.querySelector("#submit-button").textContent = "Save student";
+      document.querySelector("#cancel-edit").hidden = true;
+      formMessage.textContent = "Edit canceled.";
+      formMessage.classList.remove("error");
+    }
+
+    async function copyStudent(student) {
+      const details = [
+        `Name: ${student.name}`,
+        `Student ID: ${student.studentId}`,
+        `Class or grade: ${student.className}`,
+        `Age: ${student.age}`,
+        `Email: ${student.email}`
+      ].join("\n");
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(details);
+        } else {
+          const temporaryInput = document.createElement("textarea");
+          temporaryInput.value = details;
+          temporaryInput.style.position = "fixed";
+          temporaryInput.style.opacity = "0";
+          document.body.append(temporaryInput);
+          temporaryInput.select();
+          const copied = document.execCommand("copy");
+          temporaryInput.remove();
+          if (!copied) throw new Error("Clipboard copy failed");
+        }
+
+        formMessage.textContent = `Details copied for ${student.name}.`;
+        formMessage.classList.remove("error");
+      } catch {
+        formMessage.textContent = "Could not copy details. Check clipboard permissions.";
+        formMessage.classList.add("error");
+      }
+    }
+
+    function removeStudent(studentId) {
+      students = students.filter((student) => student.studentId !== studentId);
+      if (editingStudentId === studentId) cancelEditing();
+      if (saveStudents()) {
+        formMessage.textContent = "Student record removed.";
+        formMessage.classList.remove("error");
+        renderStudents();
+      }
+    }
+
+    studentForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(studentForm);
+      const student = {
+        name: formData.get("name").trim(),
+        studentId: formData.get("studentId").trim(),
+        className: formData.get("className").trim(),
+        age: Number(formData.get("age")),
+        email: formData.get("email").trim()
+      };
+
+      if (students.some((savedStudent) => savedStudent.studentId !== editingStudentId && savedStudent.studentId.toLowerCase() === student.studentId.toLowerCase())) {
+        formMessage.textContent = "That student ID is already in use.";
+        formMessage.classList.add("error");
+        return;
+      }
+
+      const previousStudents = students;
+      if (editingStudentId) {
+        students = students.map((savedStudent) => savedStudent.studentId === editingStudentId ? student : savedStudent);
+      } else {
+        students = [...students, student];
+      }
+
+      if (saveStudents()) {
+        editingStudentId = null;
+        studentForm.reset();
+        document.querySelector("#form-heading").textContent = "Add a student";
+        document.querySelector("#submit-button").textContent = "Save student";
+        document.querySelector("#cancel-edit").hidden = true;
+        formMessage.textContent = "Student record saved.";
+        formMessage.classList.remove("error");
+        renderStudents();
+        document.querySelector("#student-name").focus();
+      } else {
+        students = previousStudents;
+      }
+    });
+
+    document.querySelector("#cancel-edit").addEventListener("click", cancelEditing);
+    renderStudents();
+  </script>
+</body>
+</html>
